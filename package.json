@@ -10,12 +10,16 @@
 		"Other"
 	],
 	"activationEvents": [
+		"onCommand:extension.dadJoke",
 		"onCommand:extension.knowyourcode"
 	],
 	"main": "./extension.js",
 	"contributes": {
 		"commands": [
 			{
+				"command": "extension.dadJoke",
+				"title": "Dad Joke"
+      },
 				"command": "extension.knowyourcode",
 				"title": "Know Your Code"
 			},

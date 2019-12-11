@@ -58,6 +58,7 @@ async function createGist(){
     .catch(error => console.error(error));
 }
 
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
@@ -80,6 +81,10 @@ function activate(context) {
     }
   });
 
+	vscode.commands.registerCommand('extension.dadJoke', function() {
+		dadJokeRetriever();
+	});
+
 	let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
 		vscode.window.showInformationMessage('Activating Know Your Code');
   });
@@ -101,6 +106,14 @@ exports.activate = activate;
 
 // this method is called when your extension is deactivated
 function deactivate() {}
+
+function dadJokeRetriever() {
+	superagent
+	.get('https://icanhazdadjoke.com/')
+	.set('Accept', 'application/json')
+	.then(res => console.log(JSON.stringify(res.body.joke)))
+	.catch(error => console.error(error));
+}
 
 module.exports = {
 	activate,
