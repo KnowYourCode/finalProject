@@ -10,16 +10,28 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld"
+		"onCommand:extension.knowyourcode"
 	],
 	"main": "./extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "extension.helloWorld",
-				"title": "Hello World"
+				"command": "extension.knowyourcode",
+				"title": "Know Your Code"
+			},
+			{
+				"command": "extension.createGist",
+				"title": "Create Gist"
 			}
-		]
+		],
+		"menus": {
+			"editor/context": [
+				{
+					"command": "extension.createGist",
+					"group": "YourGroup@1"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"test": "node ./test/runTest.js"
@@ -34,5 +46,8 @@
 		"mocha": "^6.2.2",
 		"typescript": "^3.6.4",
 		"vscode-test": "^1.2.2"
+	},
+	"dependencies": {
+		"superagent": "^5.1.2"
 	}
 }
