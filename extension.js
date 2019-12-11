@@ -2,25 +2,42 @@
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
 
+// this method is called when the project has been created
+function startTimer(){
+  console.log('starting timer...');
+  return new Date();
+}
+
+// this method is called when the project has been closed
+// returns total time elapsed
+function calculateTimeElapsed(start){
+  let end = new Date();
+  let elapsedTime = end - start;
+  console.log(`elapsed time: ${elapsedTime}`);
+  return elapsedTime;
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-
-/**
- * @param {vscode.ExtensionContext} context
- */
 function activate(context) {
+  const start = startTimer();
+  console.log(`Started at: ${start}`);
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "knowyourcode" is now active!');
+  vscode.workspace.onDidCloseTextDocument(() => {
+    let totalElapsed = calculateTimeElapsed(start);
+    if(!context.workspaceState.get('totalTime')){
+        console.log(`Nothing in workspace: ${context.workspaceState.get('totalTime')}`);
+        context.workspaceState.update('totalTime', totalElapsed);
+        console.log(`Added to workspace: ${context.workspaceState.get('totalTime')}`);
+    }else{
+      let totalTime = context.workspaceState.get('totalTime');
+      totalTime += totalElapsed;
+      context.workspaceState.update('totalTime', totalTime);
+      console.log(`Updated workspace: ${context.workspaceState.get('totalTime')}`);
+    }
+  });
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with  registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('extension.helloWorld', function () {
-		// The code you place here will be executed every time your command is executed
-
-		// Display a message box to the user
+	let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
 		vscode.window.showInformationMessage('Hello World!');
 	});
 
