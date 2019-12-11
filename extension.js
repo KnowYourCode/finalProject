@@ -17,6 +17,23 @@ function calculateTimeElapsed(start){
   return elapsedTime;
 }
 
+function formatTimeForLogging(context){
+  let milisec = context.workspaceState.get('totalTime');
+  if(milisec < 60000){ // if less than one min - print in seconds: 60000 milisec in one min
+    return `Time spent: ${milisec / 1000}secs`;
+  }else if(milisec < 3600000){ // if less than one hour - print in mins: 3600000 milisec in 1 hour
+    let mins = Math.floor(milisec / 60000);
+    milisec %= 60000;
+    return `Time spent: ${mins}mins and ${milisec / 1000}secs`;
+  }else{ // otherwise print total hours, mins, and secs
+    let hours = Math.floor(milisec / 3600000);
+    milisec %= 3600000;
+    let mins = Math.floor(milisec / 60000);
+    milisec %= 60000;
+    return `Time spent: ${hours}hours, ${mins}mins, and ${milisec / 1000}secs`;
+  } 
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
@@ -33,10 +50,11 @@ function activate(context) {
       let totalTime = context.workspaceState.get('totalTime');
       totalTime += totalElapsed;
       context.workspaceState.update('totalTime', totalTime);
+      let result = formatTimeForLogging(context);
       console.log(`Updated workspace: ${context.workspaceState.get('totalTime')}`);
+      console.log(result);
     }
   });
-
 	let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
 		vscode.window.showInformationMessage('Hello World!');
 	});
