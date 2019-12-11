@@ -47,7 +47,7 @@ async function createGist(){
     "files": {}
   }
   gist.description = description;
-  gist[fileName] = {"content" : text}
+  gist.files[fileName] = {"content" : text}
   console.log(gist);
   const URL = 'https://api.github.com/gist';
   superagent
@@ -79,9 +79,11 @@ function activate(context) {
       console.log(result);
     }
   });
+
 	let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
-		vscode.window.showInformationMessage('Hello World!');
+		vscode.window.showInformationMessage('Activating Know Your Code');
   });
+
   vscode.commands.registerCommand('extension.createGist', function(){
     let response = createGist();
     if(response.Status === '201 Created'){
