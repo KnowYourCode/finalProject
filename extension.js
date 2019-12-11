@@ -1,6 +1,9 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
+const superagent = require('superagent');
+const editor = vscode.window.activeTextEditor;
+
 
 // this method is called when the project has been created
 function startTimer(){
@@ -34,6 +37,27 @@ function formatTimeForLogging(context){
   } 
 }
 
+async function createGist(){
+  let text = editor.document.getText(editor.selection);
+  let fileName = await vscode.window.showInputBox({ placeHolder: "Name Your Gist Here" });
+  let description = await vscode.window.showInputBox({ placeHolder: "Describe Your Gist Here" });
+  let gist = {
+    "description": '',
+    "public": true,
+    "files": {}
+  }
+  gist.description = description;
+  gist[fileName] = {"content" : text}
+  console.log(gist);
+  const URL = 'https://api.github.com/gist';
+  superagent
+    .post(URL)
+    .send(gist)
+    .set('Accept', 'application/vnd.github.v3+json')
+    .then(response => {return response})
+    .catch(error => console.error(error));
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
@@ -57,7 +81,17 @@ function activate(context) {
   });
 	let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
 		vscode.window.showInformationMessage('Hello World!');
-	});
+  });
+  vscode.commands.registerCommand('extension.createGist', function(){
+    let response = createGist();
+    if(response.Status === '201 Created'){
+      let location = response.Location;
+      console.log(`Gist successfully sent to: ${location}`);
+    }else{
+      console.log(response.Status);
+      console.log('Oops! Something went wrong. Please try again');
+    }
+  });
 
 	context.subscriptions.push(disposable);
 }
