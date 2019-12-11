@@ -1,34 +1,104 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-const superagent = require('superagent');
 const vscode = require('vscode');
+const superagent = require('superagent');
+const editor = vscode.window.activeTextEditor;
+
+
+// this method is called when the project has been created
+function startTimer(){
+  console.log('starting timer...');
+  return new Date();
+}
+
+// this method is called when the project has been closed
+// returns total time elapsed
+function calculateTimeElapsed(start){
+  let end = new Date();
+  let elapsedTime = end - start;
+  console.log(`elapsed time: ${elapsedTime}`);
+  return elapsedTime;
+}
+
+function formatTimeForLogging(context){
+  let milisec = context.workspaceState.get('totalTime');
+  if(milisec < 60000){ // if less than one min - print in seconds: 60000 milisec in one min
+    return `Time spent: ${milisec / 1000}secs`;
+  }else if(milisec < 3600000){ // if less than one hour - print in mins: 3600000 milisec in 1 hour
+    let mins = Math.floor(milisec / 60000);
+    milisec %= 60000;
+    return `Time spent: ${mins}mins and ${milisec / 1000}secs`;
+  }else{ // otherwise print total hours, mins, and secs
+    let hours = Math.floor(milisec / 3600000);
+    milisec %= 3600000;
+    let mins = Math.floor(milisec / 60000);
+    milisec %= 60000;
+    return `Time spent: ${hours}hours, ${mins}mins, and ${milisec / 1000}secs`;
+  } 
+}
+
+async function createGist(){
+  let text = editor.document.getText(editor.selection);
+  let fileName = await vscode.window.showInputBox({ placeHolder: "Name Your Gist Here" });
+  let description = await vscode.window.showInputBox({ placeHolder: "Describe Your Gist Here" });
+  let gist = {
+    "description": '',
+    "public": true,
+    "files": {}
+  }
+  gist.description = description;
+  gist.files[fileName] = {"content" : text}
+  console.log(gist);
+  const URL = 'https://api.github.com/gist';
+  superagent
+    .post(URL)
+    .send(gist)
+    .set('Accept', 'application/vnd.github.v3+json')
+    .then(response => {return response})
+    .catch(error => console.error(error));
+}
 
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-
-/**
- * @param {vscode.ExtensionContext} context
- */
 function activate(context) {
+  const start = startTimer();
+  console.log(`Started at: ${start}`);
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "knowyourcode" is now active!');
+  vscode.workspace.onDidCloseTextDocument(() => {
+    let totalElapsed = calculateTimeElapsed(start);
+    if(!context.workspaceState.get('totalTime')){
+        console.log(`Nothing in workspace: ${context.workspaceState.get('totalTime')}`);
+        context.workspaceState.update('totalTime', totalElapsed);
+        console.log(`Added to workspace: ${context.workspaceState.get('totalTime')}`);
+    }else{
+      let totalTime = context.workspaceState.get('totalTime');
+      totalTime += totalElapsed;
+      context.workspaceState.update('totalTime', totalTime);
+      let result = formatTimeForLogging(context);
+      console.log(`Updated workspace: ${context.workspaceState.get('totalTime')}`);
+      console.log(result);
+    }
+  });
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with  registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('extension.helloWorld', function () {
-		// The code you place here will be executed every time your command is executed
-		timeTracker(context);
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Know Your Code is active.');
-	});
-
-	let dadJoke = vscode.commands.registerCommand('extension.dadJoke', function() {
+	vscode.commands.registerCommand('extension.dadJoke', function() {
 		dadJokeRetriever();
 	});
+
+	let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
+		vscode.window.showInformationMessage('Activating Know Your Code');
+  });
+
+  vscode.commands.registerCommand('extension.createGist', function(){
+    let response = createGist();
+    if(response.Status === '201 Created'){
+      let location = response.Location;
+      console.log(`Gist successfully sent to: ${location}`);
+    }else{
+      console.log(response.Status);
+      console.log('Oops! Something went wrong. Please try again');
+    }
+  });
 
 	context.subscriptions.push(disposable);
 }
@@ -36,13 +106,6 @@ exports.activate = activate;
 
 // this method is called when your extension is deactivated
 function deactivate() {}
-
-function timeTracker(context) {
-		const sessionStartTime = Date.now();
-		console.log(Math.floor((sessionStartTime - sessionStartTime)/1000) + "seconds");
-		context.globalState.update('start', sessionStartTime);
-		console.log(context.globalState.get('start'));
-}
 
 function dadJokeRetriever() {
 	superagent
