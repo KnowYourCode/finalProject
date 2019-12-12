@@ -15,9 +15,7 @@ function startTimer(){
 // returns total time elapsed
 function calculateTimeElapsed(start){
   let end = new Date();
-  let elapsedTime = end - start;
-  console.log(`elapsed time: ${elapsedTime}`);
-  return elapsedTime;
+  return end - start;
 }
 
 function formatTimeForLogging(context){
@@ -37,8 +35,29 @@ function formatTimeForLogging(context){
   } 
 }
 
-async function createGist(accessToken){
-  // lines 42-51 formats the highlighted text into a gist
+// this method grabs a random joke from the icanhazdadjoke API
+function dadJokeRetriever() {
+  const URL = 'https://icanhazdadjoke.com/';
+	superagent
+	.get(URL)
+	.set('Accept', 'application/json')
+	.then(response => console.log(JSON.stringify(response.body.joke)))
+	.catch(error => console.error(error));
+}
+
+// this method asks the user for a github access token
+// if one didnt exsist. Then updates the workspace locally
+// to store the token
+async function askForToken(){
+  let newToken = null;
+  do{
+    newToken = await vscode.window.showInputBox({ placeHolder: "Please Enter Your Github Personal Access Token"});
+  }while(!newToken || newToken === '');
+  return newToken;
+}
+
+// this method formats the highlighted/selected text into a gist
+async function formatGist(){
   let text = editor.document.getText(editor.selection);
   let fileName = await vscode.window.showInputBox({ placeHolder: "Name Your Gist Here" });
   let description = await vscode.window.showInputBox({ placeHolder: "Describe Your Gist Here" });
@@ -48,9 +67,13 @@ async function createGist(accessToken){
     "files": {}
   }
   gist.description = description;
-  gist.files[fileName] = {"content" : text}
-
-  let octokit = new githubapi({auth: `token ${accessToken}`});
+  gist.files[fileName] = { "content" : text }
+  return { gist, fileName };
+}
+// this method creates the POST requests for github
+async function createGist(accessToken){
+  let { gist, fileName } = await formatGist();
+  let octokit = new githubapi({ auth: `token ${accessToken}` });
   let response = await octokit.gists.create(gist);
   if(response.status === 201){
     let body = response.data.files[fileName];
@@ -83,9 +106,8 @@ function activate(context) {
       let totalTime = context.workspaceState.get('totalTime');
       totalTime += totalElapsed;
       context.workspaceState.update('totalTime', totalTime);
-      let result = formatTimeForLogging(context);
-      console.log(`Updated workspace: ${context.workspaceState.get('totalTime')}`);
-      console.log(result);
+      let timeSpent = formatTimeForLogging(context);
+      console.log(timeSpent);
     }
   });
 
@@ -99,6 +121,11 @@ function activate(context) {
 
   vscode.commands.registerCommand('extension.createGist', function(){
     let accessToken = context.workspaceState.get('accessToken');
+    if(!accessToken){
+      accessToken = askForToken();
+      context.workspaceState.update('accessToken', accessToken);
+      console.log('Successfully Added Access Token');
+    }
     createGist(accessToken);
   });
 
@@ -112,14 +139,6 @@ exports.activate = activate;
 
 // this method is called when your extension is deactivated
 function deactivate() {}
-
-function dadJokeRetriever() {
-	superagent
-	.get('https://icanhazdadjoke.com/')
-	.set('Accept', 'application/json')
-	.then(res => console.log(JSON.stringify(res.body.joke)))
-	.catch(error => console.error(error));
-}
 
 module.exports = {
 	activate,
