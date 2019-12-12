@@ -2,8 +2,8 @@
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
 const superagent = require('superagent');
+const githubapi = require('@octokit/rest');
 const editor = vscode.window.activeTextEditor;
-
 
 // this method is called when the project has been created
 function startTimer(){
@@ -37,7 +37,8 @@ function formatTimeForLogging(context){
   } 
 }
 
-async function createGist(){
+async function createGist(accessToken){
+  // lines 42-51 formats the highlighted text into a gist
   let text = editor.document.getText(editor.selection);
   let fileName = await vscode.window.showInputBox({ placeHolder: "Name Your Gist Here" });
   let description = await vscode.window.showInputBox({ placeHolder: "Describe Your Gist Here" });
@@ -48,14 +49,16 @@ async function createGist(){
   }
   gist.description = description;
   gist.files[fileName] = {"content" : text}
-  console.log(gist);
-  const URL = 'https://api.github.com/gist';
-  superagent
-    .post(URL)
-    .send(gist)
-    .set('Accept', 'application/vnd.github.v3+json')
-    .then(response => {return response})
-    .catch(error => console.error(error));
+
+  let octokit = new githubapi({auth: `token ${accessToken}`});
+  let response = await octokit.gists.create(gist);
+  if(response.status === 201){
+    let body = response.data.files[fileName];
+    let location = body.raw_url;
+    console.log(`Gist successfully sent to: ${location}`);
+  }else{
+    console.log('Oops! Something went wrong. Please try again');
+  }
 }
 
 function testStatusBar(){
@@ -94,22 +97,16 @@ function activate(context) {
 		vscode.window.showInformationMessage('Activating Know Your Code');
   });
 
-  let createGist = vscode.commands.registerCommand('extension.createGist', function(){
-    let response = createGist();
-    if(response.Status === '201 Created'){
-      let location = response.Location;
-      console.log(`Gist successfully sent to: ${location}`);
-    }else{
-      console.log(response.Status);
-      console.log('Oops! Something went wrong. Please try again');
-    }
+  vscode.commands.registerCommand('extension.createGist', function(){
+    let accessToken = context.workspaceState.get('accessToken');
+    createGist(accessToken);
   });
 
   vscode.commands.registerCommand('extension.statusBar', function(){
     testStatusBar();
   });
 
-	context.subscriptions.push(disposable, createGist);
+	context.subscriptions.push(disposable);
 }
 exports.activate = activate;
 

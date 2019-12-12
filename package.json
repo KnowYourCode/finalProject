@@ -11,8 +11,8 @@
 	],
 	"activationEvents": [
 		"onCommand:extension.dadJoke",
-    "onCommand:extension.knowyourcode",
-    "onCommand:extension.statusBar"
+		"onCommand:extension.knowyourcode",
+		"onCommand:extension.statusBar"
 	],
 	"main": "./extension.js",
 	"contributes": {
@@ -20,19 +20,19 @@
 			{
 				"command": "extension.dadJoke",
 				"title": "Dad Joke"
-      },
-      {
+			},
+			{
 				"command": "extension.knowyourcode",
 				"title": "Know Your Code"
 			},
 			{
 				"command": "extension.createGist",
 				"title": "Create Gist"
-      },
-      {
-        "command": "extension.statusBar",
-        "title": "Test Status Bar"
-      }
+			},
+			{
+				"command": "extension.statusBar",
+				"title": "Test Status Bar"
+			}
 		],
 		"menus": {
 			"editor/context": [
@@ -58,6 +58,7 @@
 		"vscode-test": "^1.2.2"
 	},
 	"dependencies": {
+		"@octokit/rest": "^16.35.0",
 		"superagent": "^5.1.2"
 	}
 }
