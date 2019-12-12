@@ -58,6 +58,11 @@ async function createGist(){
     .catch(error => console.error(error));
 }
 
+function testStatusBar(){
+  let myTestStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1000);
+  myTestStatusBar.text = "TESTING THIS BAR";
+  myTestStatusBar.show();
+}
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -89,7 +94,7 @@ function activate(context) {
 		vscode.window.showInformationMessage('Activating Know Your Code');
   });
 
-  vscode.commands.registerCommand('extension.createGist', function(){
+  let createGist = vscode.commands.registerCommand('extension.createGist', function(){
     let response = createGist();
     if(response.Status === '201 Created'){
       let location = response.Location;
@@ -100,7 +105,11 @@ function activate(context) {
     }
   });
 
-	context.subscriptions.push(disposable);
+  vscode.commands.registerCommand('extension.statusBar', function(){
+    testStatusBar();
+  });
+
+	context.subscriptions.push(disposable, createGist);
 }
 exports.activate = activate;
 
