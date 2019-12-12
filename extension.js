@@ -1,7 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
-const superagent = require('superagent');
+//const superagent = require('superagent');
 const editor = vscode.window.activeTextEditor;
 
 // this method is called when the project has been created
@@ -89,18 +89,8 @@ function activate(context) {
 
 	vscode.commands.registerCommand('extension.dadJoke', function() {
 		dadJokeRetriever();
-	});
-
-	let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
-		vscode.window.showInformationMessage('Activating Know Your Code');
-    	let myStatusBarItem = vscode.StatusBarItem;
-			const greeting = 'Hello';
-			myStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-			myStatusBarItem.text = greeting;
-		
-			myStatusBarItem.show();
   });
-
+  
   vscode.commands.registerCommand('extension.createGist', function(){
     let response = createGist();
     if(response.Status === '201 Created'){
@@ -112,14 +102,31 @@ function activate(context) {
     }
   });
 
-	context.subscriptions.push(disposable);
+  let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
+      vscode.window.onDidCloseTextDocument(() => {
+      let totalElapsed = calculateTimeElapsed(start);
+      let timeSpent = formatTimeForLogging(totalElapsed);
+      let myStatusBarItem = vscode.StatusBarItem;
+      myStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+      myStatusBarItem.text = timeSpent;
+      myStatusBarItem.show();
+
+    })
+
+
+  });
+
+  context.subscriptions.push(disposable);
+  
+  
 }
+
 exports.activate = activate;
 
 // this method is called when your extension is deactivated
 function deactivate() {}
 
-	module.exports = {
+module.exports = {
 		activate,
 		deactivate
-	}
+}
