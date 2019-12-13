@@ -11,7 +11,8 @@
 	],
 	"activationEvents": [
 		"onCommand:extension.dadJoke",
-		"onCommand:extension.knowyourcode"
+		"onCommand:extension.knowyourcode",
+		"onCommand:extension.statusBar"
 	],
 	"main": "./extension.js",
 	"contributes": {
@@ -19,20 +20,21 @@
 			{
 				"command": "extension.dadJoke",
 				"title": "Dad Joke"
-      },
-				{"command": "extension.knowyourcode",
+			},
+			{
+				"command": "extension.knowyourcode",
 				"title": "Know Your Code"
 			},
 			{
 				"command": "extension.createGist",
 				"title": "Create Gist"
-			}
+			},
 		],
 		"menus": {
 			"editor/context": [
 				{
 					"command": "extension.createGist",
-					"group": "YourGroup@1"
+					"group": "githubgist"
 				}
 			]
 		}
@@ -52,6 +54,7 @@
 		"vscode-test": "^1.2.2"
 	},
 	"dependencies": {
+		"@octokit/rest": "^16.35.0",
 		"superagent": "^5.1.2"
 	}
 }
