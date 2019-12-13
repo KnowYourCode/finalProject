@@ -18,20 +18,19 @@ function calculateTimeElapsed(start){
   return end - start;
 }
 
-function formatTimeForLogging(context){
-  let milisec = context.workspaceState.get('totalTime');
+function formatTimeForLogging(milisec){
   if(milisec < 60000){ // if less than one min - print in seconds: 60000 milisec in one min
-    return `Time spent: ${milisec / 1000}secs`;
+    return `Time spent: ${Math.floor(milisec / 1000)}secs`;
   }else if(milisec < 3600000){ // if less than one hour - print in mins: 3600000 milisec in 1 hour
     let mins = Math.floor(milisec / 60000);
     milisec %= 60000;
-    return `Time spent: ${mins}mins and ${milisec / 1000}secs`;
+    return `Time spent: ${mins}mins and ${Math.floor(milisec / 1000)}secs`;
   }else{ // otherwise print total hours, mins, and secs
     let hours = Math.floor(milisec / 3600000);
     milisec %= 3600000;
     let mins = Math.floor(milisec / 60000);
     milisec %= 60000;
-    return `Time spent: ${hours}hours, ${mins}mins, and ${milisec / 1000}secs`;
+    return `Time spent: ${hours}hours, ${mins}mins, and ${Math.floor(milisec / 1000)}secs`;
   } 
 }
 
@@ -83,9 +82,13 @@ async function createGist(accessToken){
     console.log('Oops! Something went wrong. Please try again');
   }
 }
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
+  let isClicked = true;
+  let myStatusBar = vscode.StatusBarItem;
+  myStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   const start = startTimer();
   console.log(`Started at: ${start}`);
 
@@ -99,7 +102,8 @@ function activate(context) {
       let totalTime = context.workspaceState.get('totalTime');
       totalTime += totalElapsed;
       context.workspaceState.update('totalTime', totalTime);
-      let timeSpent = formatTimeForLogging(context);
+      let milisec = context.workspaceState.get('totalTime');
+      let timeSpent = formatTimeForLogging(milisec);
       console.log(timeSpent);
     }
   });
@@ -117,17 +121,36 @@ function activate(context) {
     createGist(accessToken);
   });
 
-  let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
-      vscode.window.onDidCloseTextDocument(() => {
-      let totalElapsed = calculateTimeElapsed(start);
-      let timeSpent = formatTimeForLogging(totalElapsed);
-      let myStatusBarItem = vscode.StatusBarItem;
-      myStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-      myStatusBarItem.text = timeSpent;
-      myStatusBarItem.show();
+  function statusBar(statusBar, start) {
+    let totalElapsed = calculateTimeElapsed(start);
+    statusBar.text = formatTimeForLogging(totalElapsed);
+    
+    statusBar.show();
+  }
 
-    })
+  vscode.window.onDidChangeTextEditorSelection(() => {
+    if(!isClicked) {
+      statusBar(myStatusBar,start);
+    }
   });
+
+  vscode.commands.registerCommand('extension.statusBar', function () {
+    if(isClicked) {
+      isClicked = false;
+      statusBar(myStatusBar,start);
+    }else {
+      isClicked = true;
+      myStatusBar.text = '$(watch)'; }
+      isClicked = !isClicked;
+  })
+
+  let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
+    vscode.window.showInformationMessage('Activating Know Your Code');
+    myStatusBar.command = 'extension.statusBar';
+    myStatusBar.text = '$(watch)';
+    myStatusBar.show();
+  });
+
   context.subscriptions.push(disposable);
 }
 
