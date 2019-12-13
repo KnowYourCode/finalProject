@@ -4,6 +4,11 @@ const vscode = require('vscode');
 const superagent = require('superagent');
 const editor = vscode.window.activeTextEditor;
 
+const cats = {
+  'Coding Cat': 'https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif',
+  'Compiling Cat': 'https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif'
+};
+
 // this method is called when the project has been created
 function startTimer(){
   console.log('starting timer...');
@@ -61,8 +66,23 @@ function dadJokeRetriever() {
 	superagent
 	.get('https://icanhazdadjoke.com/')
 	.set('Accept', 'application/json')
-	.then(res => console.log(JSON.stringify(res.body.joke)))
-	.catch(error => console.error(error));
+  .then(res => console.log(JSON.stringify(res.body.joke)))
+  .catch(error => console.error(error));
+}
+
+//WebView
+function getWebviewContent() {
+  return `<!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat Coding</title>
+  </head>
+  <body>
+    <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="300" />
+  </body>
+  </html>`;
 }
 
 // this method is called when your extension is activated
@@ -87,10 +107,10 @@ function activate(context) {
     }
   });
 
-	vscode.commands.registerCommand('extension.dadJoke', function() {
-		dadJokeRetriever();
-	});
-
+	context.subscriptions.push(vscode.commands.registerCommand('extension.dadJoke', function() {
+    dadJokeRetriever();
+  }));
+    
 	let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
 		vscode.window.showInformationMessage('Activating Know Your Code');
     	let myStatusBarItem = vscode.StatusBarItem;
@@ -112,8 +132,20 @@ function activate(context) {
     }
   });
 
+  //Web View Start
+  context.subscriptions.push(vscode.commands.registerCommand('catCoding.start', () => {
+    let panel = vscode.window.createWebviewPanel(
+      'catCoding',
+      'CatCoding',
+      vscode.ViewColumn.One,
+      {}
+    );
+    panel.webview.html = getWebviewContent();
+  }));
+
 	context.subscriptions.push(disposable);
 }
+
 exports.activate = activate;
 
 // this method is called when your extension is deactivated
