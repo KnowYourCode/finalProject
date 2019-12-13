@@ -20,7 +20,7 @@
 				"command": "extension.dadJoke",
 				"title": "Dad Joke"
       },
-				"command": "extension.knowyourcode",
+				{"command": "extension.knowyourcode",
 				"title": "Know Your Code"
 			},
 			{

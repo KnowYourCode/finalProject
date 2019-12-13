@@ -86,21 +86,10 @@ function activate(context) {
       console.log(result);
     }
   });
-
 	vscode.commands.registerCommand('extension.dadJoke', function() {
 		dadJokeRetriever();
-	});
-
-	let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
-		vscode.window.showInformationMessage('Activating Know Your Code');
-    	let myStatusBarItem = vscode.StatusBarItem;
-			const greeting = 'Hello';
-			myStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-			myStatusBarItem.text = greeting;
-		
-			myStatusBarItem.show();
   });
-
+  
   vscode.commands.registerCommand('extension.createGist', function(){
     let response = createGist();
     if(response.Status === '201 Created'){
@@ -112,14 +101,26 @@ function activate(context) {
     }
   });
 
-	context.subscriptions.push(disposable);
+  let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
+      vscode.window.onDidCloseTextDocument(() => {
+      let totalElapsed = calculateTimeElapsed(start);
+      let timeSpent = formatTimeForLogging(totalElapsed);
+      let myStatusBarItem = vscode.StatusBarItem;
+      myStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+      myStatusBarItem.text = timeSpent;
+      myStatusBarItem.show();
+
+    })
+  });
+  context.subscriptions.push(disposable);
 }
+
 exports.activate = activate;
 
 // this method is called when your extension is deactivated
 function deactivate() {}
 
-	module.exports = {
+module.exports = {
 		activate,
 		deactivate
-	}
+}
