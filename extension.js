@@ -19,19 +19,21 @@ function calculateTimeElapsed(start){
 }
 
 function formatTimeForLogging(milisec){
+  let hours = 0, mins = 0, secs = 0;
   if(milisec < 60000){ // if less than one min - print in seconds: 60000 milisec in one min
-    return `Time spent: ${Math.floor(milisec / 1000)}secs`;
+    secs = Math.floor(milisec / 1000);
   }else if(milisec < 3600000){ // if less than one hour - print in mins: 3600000 milisec in 1 hour
-    let mins = Math.floor(milisec / 60000);
+    mins = Math.floor(milisec / 60000);
     milisec %= 60000;
-    return `Time spent: ${mins}mins and ${Math.floor(milisec / 1000)}secs`;
+    secs = Math.floor(milisec / 1000);
   }else{ // otherwise print total hours, mins, and secs
-    let hours = Math.floor(milisec / 3600000);
+    hours = Math.floor(milisec / 3600000);
     milisec %= 3600000;
-    let mins = Math.floor(milisec / 60000);
+    mins = Math.floor(milisec / 60000);
     milisec %= 60000;
-    return `Time spent: ${hours}hours, ${mins}mins, and ${Math.floor(milisec / 1000)}secs`;
+    Math.floor(milisec / 1000);
   } 
+  return { hours, mins, secs };
 }
 
 // this method grabs a random joke from the icanhazdadjoke API
@@ -103,8 +105,8 @@ function activate(context) {
       totalTime += totalElapsed;
       context.workspaceState.update('totalTime', totalTime);
       let milisec = context.workspaceState.get('totalTime');
-      let timeSpent = formatTimeForLogging(milisec);
-      console.log(timeSpent);
+      const { hours, mins, secs } = formatTimeForLogging(milisec);
+      console.log(`Time spent: ${hours}hrs, ${mins}mins, and ${secs}secs`);
     }
   });
 	vscode.commands.registerCommand('extension.dadJoke', function() {
@@ -120,11 +122,11 @@ function activate(context) {
     }
     createGist(accessToken);
   });
-
-  function statusBar(statusBar, start) {
+  
+  function statusBar(statusBar, start){
     let totalElapsed = calculateTimeElapsed(start);
-    statusBar.text = formatTimeForLogging(totalElapsed);
-    
+    const { hours, mins, secs } = formatTimeForLogging(totalElapsed);
+    statusBar.text = `${hours}:${mins}:${secs}`;
     statusBar.show();
   }
 
@@ -150,7 +152,7 @@ function activate(context) {
     myStatusBar.text = '$(watch)';
     myStatusBar.show();
   });
-
+  
   context.subscriptions.push(disposable);
 }
 
