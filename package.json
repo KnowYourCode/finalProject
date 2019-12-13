@@ -28,7 +28,7 @@
 			{
 				"command": "extension.createGist",
 				"title": "Create Gist"
-			},
+			}
 		],
 		"menus": {
 			"editor/context": [

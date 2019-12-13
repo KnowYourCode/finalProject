@@ -86,6 +86,8 @@ async function createGist(accessToken){
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
+  let myStatusBar = vscode.StatusBarItem;
+  myStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   const start = startTimer();
   console.log(`Started at: ${start}`);
 
@@ -117,17 +119,21 @@ function activate(context) {
     createGist(accessToken);
   });
 
-  let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
-      vscode.window.onDidCloseTextDocument(() => {
-      let totalElapsed = calculateTimeElapsed(start);
-      let timeSpent = formatTimeForLogging(totalElapsed);
-      let myStatusBarItem = vscode.StatusBarItem;
-      myStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-      myStatusBarItem.text = timeSpent;
-      myStatusBarItem.show();
+  function statusBar(statusBar, start) {
+    let totalElapsed = calculateTimeElapsed(start);
+    statusBar.text = totalElapsed.toString();
+    statusBar.show();
+  }
 
-    })
+  vscode.window.onDidChangeTextEditorSelection(() => {
+    statusBar(myStatusBar,start);
   });
+
+  let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
+    vscode.window.showInformationMessage('Activating Know Your Code');
+    statusBar(myStatusBar,start);
+  });
+
   context.subscriptions.push(disposable);
 }
 
