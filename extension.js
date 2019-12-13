@@ -137,13 +137,9 @@ function activate(context) {
   });
 
   vscode.commands.registerCommand('extension.statusBar', function () {
-    if(isClicked) {
-      isClicked = false;
-      statusBar(myStatusBar,start);
-    }else {
-      isClicked = true;
-      myStatusBar.text = '$(watch)'; }
-      isClicked = !isClicked;
+    if(isClicked) {statusBar(myStatusBar,start);}
+    else {myStatusBar.text = '$(watch)'; }
+    isClicked = !isClicked;
   })
 
   let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
