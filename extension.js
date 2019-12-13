@@ -34,7 +34,6 @@ function formatTimeForLogging(milisec){
   } 
 }
 
-
 // this method grabs a random joke from the icanhazdadjoke API
 function dadJokeRetriever() {
   const URL = 'https://icanhazdadjoke.com/';
@@ -83,6 +82,7 @@ async function createGist(accessToken){
     console.log('Oops! Something went wrong. Please try again');
   }
 }
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
