@@ -28,6 +28,10 @@
 			{
 				"command": "extension.createGist",
 				"title": "Create Gist"
+			},
+			{
+				"command": "extension.statusBar",
+				"title": "Status Bar"
 			}
 		],
 		"menus": {
