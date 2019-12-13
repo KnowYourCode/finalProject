@@ -83,13 +83,6 @@ async function createGist(accessToken){
     console.log('Oops! Something went wrong. Please try again');
   }
 }
-
-function testStatusBar(){
-  let myTestStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1000);
-  myTestStatusBar.text = "TESTING THIS BAR";
-  myTestStatusBar.show();
-}
-
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
@@ -110,15 +103,10 @@ function activate(context) {
       console.log(timeSpent);
     }
   });
-
 	vscode.commands.registerCommand('extension.dadJoke', function() {
 		dadJokeRetriever();
-	});
-
-	let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
-		vscode.window.showInformationMessage('Activating Know Your Code');
   });
-
+  
   vscode.commands.registerCommand('extension.createGist', function(){
     let accessToken = context.workspaceState.get('accessToken');
     if(!accessToken){
@@ -129,12 +117,20 @@ function activate(context) {
     createGist(accessToken);
   });
 
-  vscode.commands.registerCommand('extension.statusBar', function(){
-    testStatusBar();
-  });
+  let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
+      vscode.window.onDidCloseTextDocument(() => {
+      let totalElapsed = calculateTimeElapsed(start);
+      let timeSpent = formatTimeForLogging(totalElapsed);
+      let myStatusBarItem = vscode.StatusBarItem;
+      myStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+      myStatusBarItem.text = timeSpent;
+      myStatusBarItem.show();
 
-	context.subscriptions.push(disposable);
+    })
+  });
+  context.subscriptions.push(disposable);
 }
+
 exports.activate = activate;
 
 // this method is called when your extension is deactivated
