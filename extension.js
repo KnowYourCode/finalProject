@@ -84,12 +84,13 @@ async function createGist(accessToken){
     console.log('Oops! Something went wrong. Please try again');
   }
 }
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
-  let myStatusBarItem = vscode.StatusBarItem;
-  myStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   let isClicked = true;
+  let myStatusBar = vscode.StatusBarItem;
+  myStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   const start = startTimer();
   console.log(`Started at: ${start}`);
 
@@ -121,7 +122,7 @@ function activate(context) {
     }
     createGist(accessToken);
   });
-
+  
   function statusBar(statusBar, start){
     let totalElapsed = calculateTimeElapsed(start);
     const { hours, mins, secs } = formatTimeForLogging(totalElapsed);
@@ -130,27 +131,28 @@ function activate(context) {
   }
 
   vscode.window.onDidChangeTextEditorSelection(() => {
-    if(!isClicked){
-      statusBar(myStatusBarItem, start);
+    if(!isClicked) {
+      statusBar(myStatusBar,start);
     }
   });
 
-  vscode.commands.registerCommand('extension.statusBar', function(){
-    if(isClicked){
-      statusBar(myStatusBarItem,start);
-    }else{
-      myStatusBarItem.text = '$(watch)';
-    }
-    isClicked = !isClicked;
+  vscode.commands.registerCommand('extension.statusBar', function () {
+    if(isClicked) {
+      isClicked = false;
+      statusBar(myStatusBar,start);
+    }else {
+      isClicked = true;
+      myStatusBar.text = '$(watch)'; }
+      isClicked = !isClicked;
   })
 
   let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
     vscode.window.showInformationMessage('Activating Know Your Code');
-    myStatusBarItem.command = 'extension.statusBar';
-    myStatusBarItem.text = '$(watch)';
-    myStatusBarItem.show();
+    myStatusBar.command = 'extension.statusBar';
+    myStatusBar.text = '$(watch)';
+    myStatusBar.show();
   });
-
+  
   context.subscriptions.push(disposable);
 }
 
