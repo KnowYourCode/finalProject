@@ -111,7 +111,8 @@ function searchStackoverflow() {
 	.get(URL)
   .then(response => {
     let data =JSON.parse(response.text);
-    console.log(data.items[0].question_score})
+    console.log(data.items[0].question_score);
+  })
 	.catch(error => console.error(error));
 }
 

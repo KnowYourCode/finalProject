@@ -41,7 +41,9 @@
 			{
 				"command": "catCoding.doRefactor",
 				"title": "Do some refactoring",
-				"category": "Cat Coding",
+				"category": "Cat Coding"
+			},
+			{
 				"command": "extension.statusBar",
 				"title": "Status Bar"
 			}
