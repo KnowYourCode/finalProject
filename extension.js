@@ -23,21 +23,22 @@ function calculateTimeElapsed(start){
   return end - start;
 }
 
-function formatTimeForLogging(context){
-  let milisec = context.workspaceState.get('totalTime');
+function formatTimeForLogging(milisec){
+  let hours = 0, mins = 0, secs = 0;
   if(milisec < 60000){ // if less than one min - print in seconds: 60000 milisec in one min
-    return `Time spent: ${milisec / 1000}secs`;
+    secs = Math.floor(milisec / 1000);
   }else if(milisec < 3600000){ // if less than one hour - print in mins: 3600000 milisec in 1 hour
-    let mins = Math.floor(milisec / 60000);
+    mins = Math.floor(milisec / 60000);
     milisec %= 60000;
-    return `Time spent: ${mins}mins and ${milisec / 1000}secs`;
+    secs = Math.floor(milisec / 1000);
   }else{ // otherwise print total hours, mins, and secs
-    let hours = Math.floor(milisec / 3600000);
+    hours = Math.floor(milisec / 3600000);
     milisec %= 3600000;
-    let mins = Math.floor(milisec / 60000);
+    mins = Math.floor(milisec / 60000);
     milisec %= 60000;
-    return `Time spent: ${hours}hours, ${mins}mins, and ${milisec / 1000}secs`;
+    Math.floor(milisec / 1000);
   } 
+  return { hours, mins, secs };
 }
 
 // this method grabs a random joke from the icanhazdadjoke API
@@ -104,9 +105,32 @@ function getWebviewContent() {
   </html>`;
 }
 
+function searchStackoverflow() {
+  const URL = 'https://api.stackexchange.com//2.2/search/excerpts?order=desc&sort=relevance&q=404 error&accepted=True&site=stackoverflow';
+	superagent
+	.get(URL)
+  .then(response => {
+    let data =JSON.parse(response.text);
+    console.log(data.items[0].question_score})
+	.catch(error => console.error(error));
+}
+
+function getQuestionLink () {
+  const URL = 'https://api.stackexchange.com/2.2/questions/18365315?order=desc&sort=activity&site=stackoverflow';
+  superagent 
+    .get(URL)
+    .then(response => {
+      let data =JSON.parse(response.text);
+      console.log(data.items[0].owner.link);
+    })
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
+  let isClicked = true;
+  let myStatusBar = vscode.StatusBarItem;
+  myStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   const start = startTimer();
   console.log(`Started at: ${start}`);
 
@@ -120,13 +144,16 @@ function activate(context) {
       let totalTime = context.workspaceState.get('totalTime');
       totalTime += totalElapsed;
       context.workspaceState.update('totalTime', totalTime);
-      let timeSpent = formatTimeForLogging(context);
-      console.log(timeSpent);
+      let milisec = context.workspaceState.get('totalTime');
+      const { hours, mins, secs } = formatTimeForLogging(milisec);
+      console.log(`Time spent: ${hours}hrs, ${mins}mins, and ${secs}secs`);
     }
   });
 
 	context.subscriptions.push(vscode.commands.registerCommand('extension.dadJoke', function() {
-    dadJokeRetriever();
+    //dadJokeRetriever();
+    searchStackoverflow();
+    //getQuestionLink();
   }));
     
   vscode.commands.registerCommand('extension.createGist', function(){
@@ -137,6 +164,25 @@ function activate(context) {
       console.log('Successfully Added Access Token');
     }
     createGist(accessToken);
+  });
+  
+  function statusBar(statusBar, start){
+    let totalElapsed = calculateTimeElapsed(start);
+    const { hours, mins, secs } = formatTimeForLogging(totalElapsed);
+    statusBar.text = `${hours}:${mins}:${secs}`;
+    statusBar.show();
+  }
+
+  vscode.window.onDidChangeTextEditorSelection(() => {
+    if(!isClicked) {
+      statusBar(myStatusBar,start);
+    }
+  });
+
+  vscode.commands.registerCommand('extension.statusBar', function () {
+    if(isClicked) {statusBar(myStatusBar,start);}
+    else {myStatusBar.text = '$(watch)'; }
+    isClicked = !isClicked;
   });
 
   // registers Cat Coding (Webview) command to start Webview
@@ -149,18 +195,14 @@ function activate(context) {
     );
     panel.webview.html = getWebviewContent();
   }));
-
+  
   let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
-      vscode.window.onDidCloseTextDocument(() => {
-      let totalElapsed = calculateTimeElapsed(start);
-      let timeSpent = formatTimeForLogging(totalElapsed);
-      let myStatusBarItem = vscode.StatusBarItem;
-      myStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-      myStatusBarItem.text = timeSpent;
-      myStatusBarItem.show();
-
-    })
+    vscode.window.showInformationMessage('Activating Know Your Code');
+    myStatusBar.command = 'extension.statusBar';
+    myStatusBar.text = '$(watch)';
+    myStatusBar.show();
   });
+  
   context.subscriptions.push(disposable);
 }
 
