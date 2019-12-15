@@ -105,24 +105,29 @@ function getWebviewContent() {
   </html>`;
 }
 
-function searchStackoverflow() {
-  const URL = 'https://api.stackexchange.com//2.2/search/excerpts?order=desc&sort=relevance&q=404 error&accepted=True&site=stackoverflow';
-	superagent
+async function searchStackoverflow() {
+  let searchString = await vscode.window.showInputBox({ placeHolder: "Search StackOverflow..."});
+  let idNumber;
+  const URL = `https://api.stackexchange.com//2.2/search/excerpts?order=desc&sort=relevance&q=${searchString}&accepted=True&site=stackoverflow`;
+  
+  if (searchString === '' || searchString === undefined) return;
+  await superagent
 	.get(URL)
   .then(response => {
     let data =JSON.parse(response.text);
-    console.log(data.items[0].question_score);
+    idNumber = data.items[0].question_id;
   })
-	.catch(error => console.error(error));
+  .catch(error => console.error(error));
+  getQuestionLink(idNumber);
 }
 
-function getQuestionLink () {
-  const URL = 'https://api.stackexchange.com/2.2/questions/18365315?order=desc&sort=activity&site=stackoverflow';
+function getQuestionLink(questionId) {
+  const URL = `https://api.stackexchange.com/2.2/questions/${questionId}?order=desc&sort=activity&site=stackoverflow`;
   superagent 
     .get(URL)
     .then(response => {
       let data =JSON.parse(response.text);
-      console.log(data.items[0].owner.link);
+      console.log(data.items[0].link);
     })
 }
 
@@ -154,7 +159,7 @@ function activate(context) {
 	context.subscriptions.push(vscode.commands.registerCommand('extension.dadJoke', function() {
     //dadJokeRetriever();
     searchStackoverflow();
-    //getQuestionLink();
+    // getQuestionLink();
   }));
     
   vscode.commands.registerCommand('extension.createGist', function(){
