@@ -92,12 +92,11 @@ async function searchStackoverflow() {
   
   if (searchString === '' || searchString === undefined) return;
   superagent
-	.get(URL)
-  .then(response => {
-    let data =JSON.parse(response.text);
-    idNumber = data.items[0].question_id;
-  })
-  .catch(error => console.error(error));
+    .get(URL)
+    .then(response => {
+      let data =JSON.parse(response.text);
+      idNumber = data.items[0].question_id;})
+    .catch(error => console.error(error));
   getQuestionLink(idNumber);
 }
 
@@ -107,8 +106,7 @@ function getQuestionLink(questionId) {
     .get(URL)
     .then(response => {
       let data =JSON.parse(response.text);
-      console.log(data.items[0].link);
-    })
+      console.log(data.items[0].link); })
     .catch(error => console.error(error));
 }
 
@@ -136,18 +134,6 @@ function activate(context) {
       console.log(`Time spent: ${hours}hrs, ${mins}mins, and ${secs}secs`);
     }
   });
-
-	context.subscriptions.push(
-    vscode.commands.registerCommand('extension.dadJoke', function() {
-      dadJokeRetriever();
-    })
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('extension.searchStackoverflow', () => {
-      searchStackoverflow();
-    })
-  );
     
   vscode.commands.registerCommand('extension.createGist', function(){
     let accessToken = context.workspaceState.get('accessToken');
@@ -186,6 +172,8 @@ function activate(context) {
   });
   
   context.subscriptions.push(disposable);
+  context.subscriptions.push(vscode.commands.registerCommand('extension.dadJoke', dadJokeRetriever);
+  context.subscriptions.push(vscode.commands.registerCommand('extension.searchStackoverflow', searchStackoverflow);
 }
 
 exports.activate = activate;
