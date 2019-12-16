@@ -7,15 +7,11 @@
 		"vscode": "^1.40.0"
 	},
 	"categories": [
-		"Other",
-		"Snippets"
+		"Other"
 	],
 	"activationEvents": [
 		"onCommand:extension.dadJoke",
 		"onCommand:extension.knowyourcode",
-		"onCommand:catCoding.start",
-		"onCommand:catCoding.doRefactor",
-		"onWebviewPanel:catCoding",
 		"onCommand:extension.statusBar",
 		"onCommand:extension.searchStackoverflow"
 	],
@@ -35,16 +31,6 @@
 				"title": "Create Gist"
 			},
 			{
-				"command": "catCoding.start",
-				"title": "Start cat coding session",
-				"category": "Cat Coding"
-			},
-			{
-				"command": "catCoding.doRefactor",
-				"title": "Do some refactoring",
-				"category": "Cat Coding"
-			},
-			{
 				"command": "extension.statusBar",
 				"title": "Status Bar"
 			},
@@ -60,13 +46,7 @@
 					"group": "githubgist"
 				}
 			]
-		},
-		"snippets": [
-			{
-				"language": "javascript",
-				"path": "./snippets/javascript.json"
-			}
-		]
+		}
 	},
 	"scripts": {
 		"test": "node ./test/runTest.js"
