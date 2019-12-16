@@ -172,8 +172,8 @@ function activate(context) {
   });
   
   context.subscriptions.push(disposable);
-  context.subscriptions.push(vscode.commands.registerCommand('extension.dadJoke', dadJokeRetriever);
-  context.subscriptions.push(vscode.commands.registerCommand('extension.searchStackoverflow', searchStackoverflow);
+  context.subscriptions.push(vscode.commands.registerCommand('extension.dadJoke', dadJokeRetriever));
+  context.subscriptions.push(vscode.commands.registerCommand('extension.searchStackoverflow', searchStackoverflow));
 }
 
 exports.activate = activate;
