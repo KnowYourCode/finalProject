@@ -18,20 +18,20 @@ function calculateTimeElapsed(start){
   return end - start;
 }
 
-function formatTimeForLogging(milisec){
+function formatTimeForLogging(millisec){
   let hours = 0, mins = 0, secs = 0;
-  if(milisec < 60000){ // if less than one min - print in seconds: 60000 milisec in one min
-    secs = Math.floor(milisec / 1000);
-  }else if(milisec < 3600000){ // if less than one hour - print in mins: 3600000 milisec in 1 hour
-    mins = Math.floor(milisec / 60000);
-    milisec %= 60000;
-    secs = Math.floor(milisec / 1000);
+  if(millisec < 60000){ // if less than one min - print in seconds: 60000 milisec in one min
+    secs = Math.floor(millisec / 1000);
+  }else if(millisec < 3600000){ // if less than one hour - print in mins: 3600000 milisec in 1 hour
+    mins = Math.floor(millisec / 60000);
+    millisec %= 60000;
+    secs = Math.floor(millisec / 1000);
   }else{ // otherwise print total hours, mins, and secs
-    hours = Math.floor(milisec / 3600000);
-    milisec %= 3600000;
-    mins = Math.floor(milisec / 60000);
-    milisec %= 60000;
-    Math.floor(milisec / 1000);
+    hours = Math.floor(millisec / 3600000);
+    millisec %= 3600000;
+    mins = Math.floor(millisec / 60000);
+    millisec %= 60000;
+    Math.floor(millisec / 1000);
   } 
   return { hours, mins, secs };
 }
@@ -122,9 +122,9 @@ function activate(context) {
   vscode.workspace.onDidCloseTextDocument(() => {
     let totalElapsed = calculateTimeElapsed(start);
     if(!context.workspaceState.get('totalTime')){
-        console.log(`Nothing in workspace: ${context.workspaceState.get('totalTime')}`);
-        context.workspaceState.update('totalTime', totalElapsed);
-        console.log(`Added to workspace: ${context.workspaceState.get('totalTime')}`);
+      console.log(`Nothing in workspace: ${context.workspaceState.get('totalTime')}`);
+      context.workspaceState.update('totalTime', totalElapsed);
+      console.log(`Added to workspace: ${context.workspaceState.get('totalTime')}`);
     }else{
       let totalTime = context.workspaceState.get('totalTime');
       totalTime += totalElapsed;
@@ -135,13 +135,16 @@ function activate(context) {
     }
   });
     
-  vscode.commands.registerCommand('extension.createGist', function(){
+  vscode.commands.registerCommand('extension.createGist', async function(){
     let accessToken = context.workspaceState.get('accessToken');
+    console.log(`line 141: ${accessToken}`);
     if(!accessToken){
-      accessToken = askForToken();
+      accessToken = await askForToken();
+      console.log(`line 144: ${accessToken}`);
       context.workspaceState.update('accessToken', accessToken);
       console.log('Successfully Added Access Token');
     }
+    console.log(`line 148: ${accessToken}`);
     createGist(accessToken);
   });
   
