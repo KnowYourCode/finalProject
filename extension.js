@@ -5,11 +5,6 @@ const superagent = require('superagent');
 const githubapi = require('@octokit/rest');
 const editor = vscode.window.activeTextEditor;
 
-const cats = {
-  'Coding Cat': 'https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif',
-  'Compiling Cat': 'https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif'
-};
-
 // this method is called when the project has been created
 function startTimer(){
   console.log('starting timer...');
@@ -90,28 +85,13 @@ async function createGist(accessToken){
   }
 }
 
-// this method sets WebView content
-function getWebviewContent() {
-  return `<!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cat Coding</title>
-  </head>
-  <body>
-    <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="300" />
-  </body>
-  </html>`;
-}
-
 async function searchStackoverflow() {
   let searchString = await vscode.window.showInputBox({ placeHolder: "Search StackOverflow..."});
   let idNumber;
   const URL = `https://api.stackexchange.com//2.2/search/excerpts?order=desc&sort=relevance&q=${searchString}&accepted=True&site=stackoverflow`;
   
   if (searchString === '' || searchString === undefined) return;
-  await superagent
+  superagent
 	.get(URL)
   .then(response => {
     let data =JSON.parse(response.text);
@@ -129,6 +109,7 @@ function getQuestionLink(questionId) {
       let data =JSON.parse(response.text);
       console.log(data.items[0].link);
     })
+    .catch(error => console.error(error));
 }
 
 // this method is called when your extension is activated
@@ -156,11 +137,17 @@ function activate(context) {
     }
   });
 
-	context.subscriptions.push(vscode.commands.registerCommand('extension.dadJoke', function() {
-    //dadJokeRetriever();
-    searchStackoverflow();
-    // getQuestionLink();
-  }));
+	context.subscriptions.push(
+    vscode.commands.registerCommand('extension.dadJoke', function() {
+      dadJokeRetriever();
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('extension.searchStackoverflow', () => {
+      searchStackoverflow();
+    })
+  );
     
   vscode.commands.registerCommand('extension.createGist', function(){
     let accessToken = context.workspaceState.get('accessToken');
@@ -190,17 +177,6 @@ function activate(context) {
     else {myStatusBar.text = '$(watch)'; }
     isClicked = !isClicked;
   });
-
-  // registers Cat Coding (Webview) command to start Webview
-  context.subscriptions.push(vscode.commands.registerCommand('catCoding.start', () => {
-    let panel = vscode.window.createWebviewPanel(
-      'catCoding',
-      'CatCoding',
-      vscode.ViewColumn.One,
-      {}
-    );
-    panel.webview.html = getWebviewContent();
-  }));
   
   let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
     vscode.window.showInformationMessage('Activating Know Your Code');
