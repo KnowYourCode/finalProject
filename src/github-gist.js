@@ -2,7 +2,6 @@ const vscode = require('vscode');
 const githubapi = require('@octokit/rest');
 const editor = vscode.window.activeTextEditor;
 
-
 // this method asks the user for a github access token
 // if one didnt exsist. Then updates the workspace locally
 // to store the token

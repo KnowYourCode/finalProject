@@ -1,9 +1,0 @@
-{
-    "API request": {
-        "prefix": ["request", "api-request"],
-        "body": [
-            "request\n.get('/search')\n.then(res => {\n//res.body, res.headers, res.status\n})\n.catch(err => {\n //err.message, err.response\n});"
-        ],
-        "description": "An API request."
-    }
-}

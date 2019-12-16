@@ -22,8 +22,8 @@ function activate(context) {
   }
   
   function toggleStatusBar(){
-    if(isClicked) {statusBar(start);}
-    else {myStatusBar.text = '$(watch)'; }
+    if(isClicked) { statusBar(start); }
+    else { myStatusBar.text = '$(watch)'; }
     isClicked = !isClicked;
   }
 
