@@ -85,6 +85,31 @@ async function createGist(accessToken){
   }
 }
 
+async function searchStackoverflow() {
+  let searchString = await vscode.window.showInputBox({ placeHolder: "Search StackOverflow..."});
+  let idNumber;
+  const URL = `https://api.stackexchange.com//2.2/search/excerpts?order=desc&sort=relevance&q=${searchString}&accepted=True&site=stackoverflow`;
+  
+  if (searchString === '' || searchString === undefined) return;
+  superagent
+    .get(URL)
+    .then(response => {
+      let data =JSON.parse(response.text);
+      idNumber = data.items[0].question_id;})
+    .catch(error => console.error(error));
+  getQuestionLink(idNumber);
+}
+
+function getQuestionLink(questionId) {
+  const URL = `https://api.stackexchange.com/2.2/questions/${questionId}?order=desc&sort=activity&site=stackoverflow`;
+  superagent 
+    .get(URL)
+    .then(response => {
+      let data =JSON.parse(response.text);
+      console.log(data.items[0].link); })
+    .catch(error => console.error(error));
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
@@ -109,10 +134,7 @@ function activate(context) {
       console.log(`Time spent: ${hours}hrs, ${mins}mins, and ${secs}secs`);
     }
   });
-	vscode.commands.registerCommand('extension.dadJoke', function() {
-		dadJokeRetriever();
-  });
-  
+    
   vscode.commands.registerCommand('extension.createGist', function(){
     let accessToken = context.workspaceState.get('accessToken');
     if(!accessToken){
@@ -140,8 +162,8 @@ function activate(context) {
     if(isClicked) {statusBar(myStatusBar,start);}
     else {myStatusBar.text = '$(watch)'; }
     isClicked = !isClicked;
-  })
-
+  });
+  
   let disposable = vscode.commands.registerCommand('extension.knowyourcode', function () {
     vscode.window.showInformationMessage('Activating Know Your Code');
     myStatusBar.command = 'extension.statusBar';
@@ -150,6 +172,8 @@ function activate(context) {
   });
   
   context.subscriptions.push(disposable);
+  context.subscriptions.push(vscode.commands.registerCommand('extension.dadJoke', dadJokeRetriever);
+  context.subscriptions.push(vscode.commands.registerCommand('extension.searchStackoverflow', searchStackoverflow);
 }
 
 exports.activate = activate;
