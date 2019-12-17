@@ -3,6 +3,7 @@
 const vscode = require('vscode');
 const dadJokeRetriever = require('./src/dad-joke.js');
 const searchStackoverflow = require('./src/stack-overflow.js');
+const output = vscode.window.createOutputChannel('Output');
 const { askForToken, createGist } = require('./src/github-gist.js');
 const { startTimer, calculateTimeElapsed, formatTimeForLogging } = require('./src/timer.js');
 
@@ -12,7 +13,7 @@ function activate(context) {
   const start = startTimer();
   let isClicked = true;
   let myStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-  console.log(`Started timer: ${start}`);
+  output.appendLine(`Started timer: ${start}`);
 
   function statusBar(start){
     let totalElapsed = calculateTimeElapsed(start);
@@ -37,7 +38,7 @@ function activate(context) {
       totalTime += totalElapsed;
       context.workspaceState.update('totalTime', totalTime);
       const { hours, mins, secs } = formatTimeForLogging(totalTime);
-      console.log(`Time spent: ${hours}hrs, ${mins}mins, and ${secs}secs`);
+      output.appendLine(`Time spent: ${hours}hrs, ${mins}mins, and ${secs}secs`);
     }
   });
     
@@ -46,7 +47,7 @@ function activate(context) {
     if(!accessToken){
       accessToken = await askForToken();
       context.workspaceState.update('accessToken', accessToken);
-      console.log('Successfully Added Access Token');
+      output.appendLine('Successfully Added Access Token');
     }
     createGist(accessToken);
   });
