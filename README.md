@@ -23,6 +23,10 @@ Know Your Code is a Visual Studio Code Extension that helps you track your progr
 * `extension.dadJoke`: retrieves dad joke from ICanHazDadJoke API
 * `extension.searchStackoverflow`: searches stackoverflow with user input
 
+## Configuration
+
+Use <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> to activate features via drop down menu
+
 
 ## Known Issues
 Please report issues via GitHub Issues 
