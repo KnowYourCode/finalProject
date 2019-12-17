@@ -1,5 +1,6 @@
 const vscode = require('vscode');
 const superagent = require('superagent');
+const output = vscode.window.createOutputChannel('StackOverflow');
 
 module.exports = async function searchStackoverflow() {
   let searchString = await vscode.window.showInputBox({ placeHolder: "Search StackOverflow..."});
@@ -22,6 +23,7 @@ function getQuestionLink(questionId) {
     .get(URL)
     .then(response => {
       let data =JSON.parse(response.text);
-      console.log(data.items[0].link); })
+      output.appendLine(data.items[0].link); 
+    })
     .catch(error => console.error(error));
 }

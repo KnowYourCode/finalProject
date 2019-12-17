@@ -1,5 +1,6 @@
 const vscode = require('vscode');
 const githubapi = require('@octokit/rest');
+const output = vscode.window.createOutputChannel("Gists");
 
 // this method asks the user for a github access token
 // if one didnt exsist. Then updates the workspace locally
@@ -36,9 +37,9 @@ async function createGist(accessToken){
   if(response.status === 201){
     let body = response.data.files[fileName];
     let location = body.raw_url;
-    console.log(`Gist successfully sent to: ${location}`);
+    output.appendLine(`Gist successfully sent to: ${location}`);
   }else{
-    console.log('Oops! Something went wrong. Please try again');
+    output.appendLine('Oops! Something went wrong. Please try again');
   }
 }
 
