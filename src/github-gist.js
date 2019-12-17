@@ -1,6 +1,5 @@
 const vscode = require('vscode');
 const githubapi = require('@octokit/rest');
-const editor = vscode.window.activeTextEditor;
 
 // this method asks the user for a github access token
 // if one didnt exsist. Then updates the workspace locally
@@ -15,6 +14,7 @@ async function askForToken(){
 
 // this method formats the highlighted/selected text into a gist
 async function formatGist(){
+  const editor = vscode.window.activeTextEditor;
   let text = editor.document.getText(editor.selection);
   let fileName = await vscode.window.showInputBox({ placeHolder: "Name Your Gist Here" });
   let description = await vscode.window.showInputBox({ placeHolder: "Describe Your Gist Here" });
