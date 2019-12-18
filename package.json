@@ -7,6 +7,10 @@
 	"engines": {
 		"vscode": "^1.40.0"
 	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/KnowYourCode/finalProject"
+	  },
 	"categories": [
 		"Other"
 	],
@@ -66,5 +70,6 @@
 	"dependencies": {
 		"@octokit/rest": "^16.35.0",
 		"superagent": "^5.1.2"
-	}
+	},
+	"icon": "./src/kycLogo128.png"
 }
