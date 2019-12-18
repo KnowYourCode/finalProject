@@ -1,6 +1,6 @@
 const superagent = require('superagent');
-const vscode = require('vscode');
-const output = vscode.window.createOutputChannel("DadJoke");
+const output = require('./output.js');
+
 // this method grabs a random joke from the icanhazdadjoke API
 module.exports = function dadJokeRetriever() {
   const URL = 'https://icanhazdadjoke.com/';
