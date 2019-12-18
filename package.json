@@ -3,7 +3,7 @@
 	"displayName": "KnowYourCode",
 	"description": "",
 	"publisher": "TeamKYC",
-	"version": "0.2.2",
+	"version": "0.2.3",
 	"engines": {
 		"vscode": "^1.40.0"
 	},
