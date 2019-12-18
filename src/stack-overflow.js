@@ -1,6 +1,6 @@
 const vscode = require('vscode');
 const superagent = require('superagent');
-const output = vscode.window.createOutputChannel('StackOverflow');
+const output = require('./output.js');
 
 module.exports = async function searchStackoverflow() {
   let searchString = await vscode.window.showInputBox({ placeHolder: "Search StackOverflow..."});
