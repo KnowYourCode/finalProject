@@ -3,9 +3,10 @@
 const vscode = require('vscode');
 const dadJokeRetriever = require('./src/dad-joke.js');
 const searchStackoverflow = require('./src/stack-overflow.js');
-const output = vscode.window.createOutputChannel('Output');
+// const output = vscode.window.createOutputChannel('Output');
 const { askForToken, createGist } = require('./src/github-gist.js');
 const { startTimer, calculateTimeElapsed, formatTimeForLogging } = require('./src/timer.js');
+const output = require('./src/output.js');
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed

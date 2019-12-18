@@ -1,6 +1,6 @@
 const vscode = require('vscode');
 const githubapi = require('@octokit/rest');
-const output = vscode.window.createOutputChannel("Gists");
+const output = require('./output.js');
 
 // this method asks the user for a github access token
 // if one didnt exsist. Then updates the workspace locally
