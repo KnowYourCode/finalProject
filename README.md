@@ -13,7 +13,7 @@ Know Your Code is a Visual Studio Code Extension that helps you track your progr
 ## Requirements
 
 * NPM
-* GiHub Api and access token
+* GitHub Api and access token
 
 ## Extension Settings
 
