@@ -11,6 +11,7 @@
 		"type": "git",
 		"url": "https://github.com/KnowYourCode/finalProject"
 	},
+	"icon": "./src/kycLogo128.png",
 	"categories": [
 		"Other"
 	],
@@ -70,6 +71,5 @@
 	"dependencies": {
 		"@octokit/rest": "^16.35.0",
 		"superagent": "^5.1.2"
-	},
-	"icon": "./src/kycLogo128.png"
+	}
 }
