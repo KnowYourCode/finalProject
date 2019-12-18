@@ -3,7 +3,6 @@
 const vscode = require('vscode');
 const dadJokeRetriever = require('./src/dad-joke.js');
 const searchStackoverflow = require('./src/stack-overflow.js');
-// const output = vscode.window.createOutputChannel('Output');
 const { askForToken, createGist } = require('./src/github-gist.js');
 const { startTimer, calculateTimeElapsed, formatTimeForLogging } = require('./src/timer.js');
 const output = require('./src/output.js');
